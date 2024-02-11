@@ -1,0 +1,49 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract MyToken is ERC20, Ownable {
+
+    // Token initialization with 300 tokens assigned to the deployer
+    constructor() ERC20("Gaming Token", "GT") Ownable(msg.sender) {
+        uint8 tokenDecimalsAlt = 0;
+        uint256 initialTokenSupplyAlt = 500;
+
+        _mint(_msgSender(), initialTokenSupplyAlt * (10**tokenDecimalsAlt));
+    }
+
+    // Mint tokens for a specified address
+    function mintTokens(address recipient, uint256 additionalTokens) public onlyOwner {
+        require(additionalTokens > 0, "Invalid mint amount");
+        require(msg.sender == owner(), "Owner permission required");
+        _mint(recipient, additionalTokens);
+    }
+
+    // Burn tokens from the sender's address
+    function burnTokens(uint256 subtractTokens) public {
+        require(subtractTokens > 0, "Invalid burn amount");
+        require(subtractTokens <= balanceOf(_msgSender()), "Insufficient balance");
+        _burn(_msgSender(), subtractTokens);
+    }
+
+    // Transfer tokens to a specified address
+    function transferTokens(address to, uint256 sharedTokens) public returns (bool) {
+        require(to != address(0), "Invalid recipient");
+        require(sharedTokens > 0, "Invalid transfer amount");
+        require(sharedTokens <= balanceOf(_msgSender()), "Insufficient balance");
+        _transfer(_msgSender(), to, sharedTokens);
+        return true;
+    }
+
+    // Get total token supply
+    function getTotalSupply() public view returns (uint256) {
+        return totalSupply();
+    }
+
+    // Get token decimals
+    function getTokenDecimals() public view returns (uint8) {
+        return decimals();
+    }
+}
